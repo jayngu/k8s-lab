@@ -1,8 +1,29 @@
-# Getting Started
+# What will we accomplish?
+
+The following guide allows you to setup a multi-node Kubernetes cluster with Vagrant. The final result:
+- 1 Master Node
+- 2 Worker Nodes
+- Last tested with: Kubernetes version 1.9.5
+- Calico 1.7 as the CNI
+
+>Aside: I used the scripts located in **bootstrap.sh** and **master.sh** to also create a cluster on DigitalOcean droplets.
+
+## Prerequisites
+
+- Preferrably a linux machine
+- Vagrant and VirtualBox installed
+- As much RAM as possible. The inital setup takes around 4 GB 
+
+## Getting Started
+
+```
+git clone https://github.com/jayngu/k8s-lab
+cd ~/k8s-lab
+```
 
 Initialize vagrant machines and get coffee.
 ```
-$ vagrant up
+~/k8s-lab$ vagrant up
 ```
 
 Check vagrant machine status.
