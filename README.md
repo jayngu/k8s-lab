@@ -4,7 +4,7 @@ The following guide allows you to setup a multi-node Kubernetes cluster with Vag
 - 1 Master Node
 - 2 Worker Nodes
 - Last tested with: Kubernetes version 1.9.5
-- Calico 1.7 as the CNI
+- Calico v3.0.3 as the CNI
 
 >Aside: I used the scripts located in **bootstrap.sh** and **master.sh** to also create a cluster on DigitalOcean droplets.
 
