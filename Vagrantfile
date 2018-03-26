@@ -25,7 +25,7 @@ Vagrant.configure('2') do |config|
   end
 
   (1..NUM_WORKERS).each do |n|
-    config.vm.define "worker#{n}" do |worker|
+    config.vm.define "worker-#{n}" do |worker|
       worker.vm.box = UBUNTU_BOX
       worker.vm.hostname = "worker#{n}"
       worker.vm.box_url = UBUNTU_BOX

@@ -15,6 +15,8 @@ sudo add-apt-repository \
    $(lsb_release -cs) \
    stable"
 
+# Docker Version v1.12 is recommended, but v1.11, v1.13 and 17.03
+# Versions 17.06+ might work, but have not yet been tested and verified by the Kubernetes node team
 sudo apt-get update && sudo apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}')
 docker version
 
@@ -24,7 +26,9 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
  
 sudo apt-get update
-sudo apt-get install -y kubelet kubeadm kubectl # Last tested with versions: 1.9.5-00
+sudo apt-get install -y kubelet=1.9.2-00   
+sudo apt-get install -y kubectl=1.9.2-00
+sudo apt-get install -y kubeadm=1.9.2-00 # Last tested with versions: 1.9.5-00
 
 cat << EOF > /etc/docker/daemon.json
 {

@@ -12,15 +12,40 @@ KUBEROUTER_NETWORK_CIDR="10.1.0.0/16"
 
 OUTPUT_FILE="kubeadmjoin.sh"
 
-echo "Initializing master node..."
-kubeadm init --apiserver-advertise-address=${NODE_IP_ADDRESS} --pod-network-cidr=${CALICO_NETWORK_CIDR} | grep "kubeadm join" > ${OUTPUT_FILE}
+# echo "Initializing master node with Calico..."
+# kubeadm init --apiserver-advertise-address=${NODE_IP_ADDRESS} --pod-network-cidr=${CALICO_NETWORK_CIDR} | grep "kubeadm join" > ${OUTPUT_FILE}
+
+# echo "Initializing master node with Flannel..."
+# kubeadm init --apiserver-advertise-address=${NODE_IP_ADDRESS} --pod-network-cidr=${FLANNEL_NETWORK_CIDR} | grep "kubeadm join" > ${OUTPUT_FILE}
+
+# echo "Initializing master node with kube-router..."
+# kubeadm init --apiserver-advertise-address=${NODE_IP_ADDRESS} --pod-network-cidr=${KUBEROUTER_NETWORK_CIDR} | grep "kubeadm join" > ${OUTPUT_FILE}
+
+echo "Initializing master node with Weave Net..."
+kubeadm init --apiserver-advertise-address=${NODE_IP_ADDRESS} | grep "kubeadm join" > ${OUTPUT_FILE}
+
 # kubeadm init --apiserver-advertise-address=${DROPLET_IP_ADDRESS} --pod-network-cidr=${CALICO_NETWORK_CIDR} | grep "kubeadm join" > ${OUTPUT_FILE}
+# kubeadm init --apiserver-advertise-address=${DROPLET_IP_ADDRESS} | grep "kubeadm join" > ${OUTPUT_FILE}
+
 export KUBECONFIG=/etc/kubernetes/admin.conf
 chmod 644 /etc/kubernetes/admin.conf
 
-# Set calico as CNI
-kubectl apply -f https://docs.projectcalico.org/v3.0/getting-started/kubernetes/installation/hosted/kubeadm/1.7/calico.yaml
-# Set flannel as CNI
-#kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-# Set kube-router as CNI
-#kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter.yaml
+# kubectl create secret docker-registry gitlabreg-secret --docker-server=<gitlab-server> --docker-username=<username> --docker-password=<pw> --docker-email=<email> --namespace=default
+
+###########################################################################################
+## Create the pod network for the cluster. CNI listed in the following order:
+## - Calico
+## - Flannel
+## - kube-router
+## - Weave Net
+###########################################################################################
+
+# kubectl apply -f https://docs.projectcalico.org/v3.0/getting-started/kubernetes/installation/hosted/kubeadm/1.7/calico.yaml
+
+# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
+
+# kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter.yaml
+
+export kubever=$(kubectl version | base64 | tr -d '\n')
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever"
