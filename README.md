@@ -3,14 +3,12 @@
 The following guide allows you to setup a multi-node Kubernetes cluster with Vagrant. The final result:
 - 1 Master Node
 - 2 Worker Nodes
-- Last tested with: Kubernetes version 1.9.5
-- Calico v3.0.3 as the CNI
-
->Aside: I used the scripts located in **bootstrap.sh** and **master.sh** to also create a cluster on DigitalOcean droplets.
+- Last tested with: Kubernetes version 1.9.8
+- Calico Overlay Network
 
 ## Prerequisites
 
-- Preferrably a linux machine
+- Preferrably a UNIX based machine
 - Vagrant and VirtualBox installed
 - As much RAM as possible. The inital setup takes around 4 GB 
 
@@ -36,7 +34,6 @@ master                    running (virtualbox)
 worker1                   running (virtualbox)
 worker2                   running (virtualbox)
 ```
-
 
 SSH into the master node / worker nodes
 ```
@@ -78,9 +75,9 @@ Run 'kubectl get nodes' on the master to see this node join the cluster.
 Check node status on the master: **kubectl get nodes**
 ```
 NAME      STATUS    ROLES     AGE       VERSION
-master    Ready     master    18m       v1.9.5
-worker1   Ready     <none>    8m        v1.9.5
-worker2   Ready     <none>    8m        v1.9.5
+master    Ready     master    18m       v1.9.8
+worker1   Ready     <none>    8m        v1.9.8
+worker2   Ready     <none>    8m        v1.9.8
 ```
 
 Check pod status on the master: **kubectl get pods --all-namespaces -o wide**

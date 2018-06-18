@@ -8,6 +8,10 @@ sudo apt-get install -y \
     curl \
     software-properties-common
 
+# Default Ubuntu ethernet interface (enp0s8) for ubuntu/xenial64 image
+NODE_IP_ADDRESS=$(ip addr show dev enp0s8 | awk 'match($0,/inet (([0-9]|\.)+).* scope global enp0s8$/,a) { print a[1]; exit }')
+CGROUP=systemd
+
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 
 sudo add-apt-repository \
@@ -18,7 +22,6 @@ sudo add-apt-repository \
 # Docker Version v1.12 is recommended, but v1.11, v1.13 and 17.03
 # Versions 17.06+ might work, but have not yet been tested and verified by the Kubernetes node team
 sudo apt-get update && sudo apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}')
-docker version
 
 sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
@@ -26,38 +29,24 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
  
 sudo apt-get update
-sudo apt-get install -y kubelet=1.9.2-00   
-sudo apt-get install -y kubectl=1.9.2-00
-sudo apt-get install -y kubeadm=1.9.2-00 # Last tested with versions: 1.9.5-00
+sudo apt-get install -y kubelet=1.9.8-00   
+sudo apt-get install -y kubectl=1.9.8-00
+sudo apt-get install -y kubeadm=1.9.8-00 
 
 # Docker and kubelet must use the same cgroupdriver
 # systemd or cgroupfs
 cat << EOF > /etc/docker/daemon.json
 {
-  "exec-opts": ["native.cgroupdriver=systemd"]
+  "exec-opts": ["native.cgroupdriver=$CGROUP"]
 }
 EOF
 
-# Default Ubuntu ethernet interface (enp0s8) for ubuntu/xenial64 image
-NODE_IP_ADDRESS=$(ip addr show dev enp0s8 | awk 'match($0,/inet (([0-9]|\.)+).* scope global enp0s8$/,a) { print a[1]; exit }')
-
-# Default Ubuntu ethernet interface (eth0) for DO droplet
-# DROPLET_IP_ADDRESS=$(ip addr show dev eth0 | awk 'match($0,/inet (([0-9]|\.)+).* scope global eth0$/,a) { print a[1]; exit }')
-
-# pass bridged IPv4 traffic to iptables’ chains
-# required for Weave Net, Flannel, kube-router, Romana
-sysctl net.bridge.bridge-nf-call-iptables=1
-
-##################################################################
-# Change kubelet configurations in 10-kubeadm.conf
-# --node-ip
-# --cgroup-driver
-##################################################################
+# Pass bridged IPv4 traffic to iptables’ chains
+# Required for Weave Net, Flannel, kube-router, Romana
+# sysctl net.bridge.bridge-nf-call-iptables=1
 
 echo "Environment=\"KUBELET_EXTRA_ARGS=--node-ip=$NODE_IP_ADDRESS\"" >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-# echo "Environment=\"KUBELET_EXTRA_ARGS=--node-ip=$DROPLET_IP_ADDRESS\"" >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-echo "Environment=\"KUBELET_CGROUP_ARGS=--cgroup-driver=systemd\"" >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-#echo "Environment=\"KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs\"" >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+echo "Environment=\"KUBELET_CGROUP_ARGS=--cgroup-driver=$CGROUP\"" >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 
 sudo systemctl daemon-reload
 sudo systemctl restart kubelet

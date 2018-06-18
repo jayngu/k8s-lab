@@ -2,9 +2,9 @@
 # vi: set ft=ruby :
 
 # Vagrant version: 2.0.2
-# Virtual Box version: 5.1
+# Virtual Box version: 5.2
 
-UBUNTU_BOX = 'ubuntu/xenial64' # version '20180215.0.0', (GNU/Linux 4.4.0-112-generic x86_64)
+UBUNTU_BOX = 'ubuntu/xenial64' # (v20180615.0.0) (GNU/Linux 4.4.0-112-generic x86_64)
 NUM_WORKERS = 2
 MEM_WORKERS = 512
 
